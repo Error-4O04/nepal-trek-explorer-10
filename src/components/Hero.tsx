@@ -72,10 +72,6 @@ export const Hero = ({ onExplore }: HeroProps) => {
               <Compass className="w-5 h-5" />
               Start Exploring
             </Button>
-            <Button variant="outline" size="xl">
-              <Leaf className="w-5 h-5" />
-              Our Mission
-            </Button>
           </div>
         </div>
       </div>

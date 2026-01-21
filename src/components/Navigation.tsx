@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Mountain, Menu, X, Compass, Calculator, Calendar, Users, Leaf } from 'lucide-react';
+import { Mountain, Menu, X, Compass, Calendar, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 interface NavigationProps {
@@ -11,10 +12,9 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'discover', label: 'Discover', icon: Compass },
-    { id: 'carbon', label: 'Carbon Calculator', icon: Calculator },
-    { id: 'planner', label: 'Trip Planner', icon: Calendar },
-    { id: 'community', label: 'Community', icon: Users },
+    { id: 'discover', label: 'Discover', icon: Compass, path: '/#discover' },
+    { id: 'trip-planner', label: 'Trip Planner', icon: Calendar, path: '/#planner' },
+    { id: 'community', label: 'Community', icon: Users, path: '/#community' },
   ];
 
   const handleNavigate = (section: string) => {
@@ -27,37 +27,31 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <button
-            onClick={() => handleNavigate('hero')}
+          <Link
+            to="/"
             className="flex items-center gap-2 font-display text-xl font-bold text-primary hover:opacity-80 transition-opacity"
           >
             <Mountain className="w-7 h-7" />
             <span className="hidden sm:block">Nepal Hidden Gems</span>
-          </button>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
-              <Button
-                key={item.id}
-                variant={activeSection === item.id ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => handleNavigate(item.id)}
-                className="gap-2"
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </Button>
+              <a key={item.id} href={item.path} className="no-underline">
+                <Button
+                  variant={activeSection === item.id ? 'default' : 'ghost'}
+                  size="sm"
+                  className="gap-2"
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </Button>
+              </a>
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Button variant="hero" size="sm" className="gap-2">
-              <Leaf className="w-4 h-4" />
-              Go Green
-            </Button>
-          </div>
+
 
           {/* Mobile Menu Button */}
           <button
@@ -73,20 +67,16 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
           <div className="md:hidden py-4 border-t border-border/50 animate-fade-in">
             <div className="flex flex-col gap-2">
               {navItems.map((item) => (
-                <Button
-                  key={item.id}
-                  variant={activeSection === item.id ? 'default' : 'ghost'}
-                  onClick={() => handleNavigate(item.id)}
-                  className="justify-start gap-3"
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.label}
-                </Button>
+                <a key={item.id} href={item.path} className="no-underline">
+                  <Button
+                    variant={activeSection === item.id ? 'default' : 'ghost'}
+                    className="justify-start gap-3 w-full"
+                  >
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </Button>
+                </a>
               ))}
-              <Button variant="hero" className="mt-4 gap-2">
-                <Leaf className="w-4 h-4" />
-                Go Green
-              </Button>
             </div>
           </div>
         )}

@@ -1,18 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mountain, Leaf, Compass, PawPrint, Sparkles, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TrekCard } from './TrekCard';
-import { treks, Trek } from '@/data/treks';
+import { destinationsService, DestinationWithDetails } from '../services/supabaseService';
 import { toast } from '@/hooks/use-toast';
 
 type Difficulty = 'All' | 'Easy' | 'Moderate' | 'Challenging';
 type Vibe = 'All' | 'Peaceful' | 'Adventure' | 'Cultural' | 'Wildlife';
 
 export const DiscoverTreks = () => {
+  const [destinations, setDestinations] = useState<DestinationWithDetails[]>([]);
+  const [loading, setLoading] = useState(true);
   const [difficulty, setDifficulty] = useState<Difficulty>('All');
   const [vibe, setVibe] = useState<Vibe>('All');
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+
+  // Fetch destinations from Supabase
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      setLoading(true);
+      const data = await destinationsService.getAll();
+      setDestinations(data);
+      setLoading(false);
+    };
+    fetchDestinations();
+  }, []);
 
   const difficultyOptions: { value: Difficulty; label: string; icon: React.ReactNode }[] = [
     { value: 'All', label: 'All Levels', icon: <Sparkles className="w-4 h-4" /> },
@@ -29,10 +42,10 @@ export const DiscoverTreks = () => {
     { value: 'Wildlife', label: 'Wildlife', icon: <PawPrint className="w-4 h-4" /> },
   ];
 
-  const filteredTreks = treks.filter((trek) => {
-    const matchesDifficulty = difficulty === 'All' || trek.difficulty === difficulty;
-    const matchesVibe = vibe === 'All' || trek.vibes.includes(vibe as any);
-    const matchesFavorites = !showFavoritesOnly || favorites.includes(trek.id);
+  const filteredDestinations = destinations.filter((dest) => {
+    const matchesDifficulty = difficulty === 'All' || dest.difficulty === difficulty;
+    const matchesVibe = vibe === 'All' || (dest.vibes && dest.vibes.includes(vibe as any));
+    const matchesFavorites = !showFavoritesOnly || favorites.includes(dest.id);
     return matchesDifficulty && matchesVibe && matchesFavorites;
   });
 
@@ -42,12 +55,15 @@ export const DiscoverTreks = () => {
     );
   };
 
-  const handleBook = (trek: Trek) => {
+  const handleBook = (destination: DestinationWithDetails) => {
     toast({
       title: "Booking Initiated! 🎉",
-      description: `You're booking ${trek.name}. We'll contact you shortly with details.`,
+      description: `You're booking ${destination.name}. We'll contact you shortly with details.`,
     });
   };
+
+  // Debug: Log to verify Heart is available
+  console.log('DiscoverTreks component loaded. Heart icon available:', Heart);
 
   return (
     <section className="py-16 px-6">
@@ -123,22 +139,29 @@ export const DiscoverTreks = () => {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filteredTreks.length}</span> treks
+            Showing <span className="font-semibold text-foreground">{filteredDestinations.length}</span> destinations
           </p>
         </div>
 
-        {/* Trek Grid */}
-        {filteredTreks.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="inline-block">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+            <p className="text-muted-foreground mt-4">Loading treks...</p>
+          </div>
+        ) : filteredDestinations.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTreks.map((trek, index) => (
+            {filteredDestinations.map((destination, index) => (
               <div
-                key={trek.id}
+                key={destination.id}
                 className="animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <TrekCard
-                  trek={trek}
-                  isFavorite={favorites.includes(trek.id)}
+                  destination={destination}
+                  isFavorite={favorites.includes(destination.id)}
                   onToggleFavorite={toggleFavorite}
                   onBook={handleBook}
                 />

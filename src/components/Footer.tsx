@@ -25,7 +25,6 @@ export const Footer = () => {
             <h4 className="font-display font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-primary-foreground/80">
               <li><a href="#" className="hover:text-primary-foreground transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-primary-foreground transition-colors">Our Mission</a></li>
               <li><a href="#" className="hover:text-primary-foreground transition-colors">Sustainability</a></li>
               <li><a href="#" className="hover:text-primary-foreground transition-colors">Contact</a></li>
             </ul>
