@@ -181,6 +181,10 @@ const ActivityLog = () => {
     }
   };
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+
   const formatDate = (date: Date) => {
     const today = new Date();
     const yesterday = new Date(today);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Mail, Phone, Calendar, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { useCurrency } from '@/lib/CurrencyContext';
 
 interface BookingFormProps {
   trekName: string;
@@ -19,6 +20,8 @@ export const BookingForm = ({ trekName, trekPrice }: BookingFormProps) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { format: formatCurrency } = useCurrency();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -182,7 +185,7 @@ export const BookingForm = ({ trekName, trekPrice }: BookingFormProps) => {
         <div className="bg-secondary/30 border border-secondary/50 rounded-lg p-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-muted-foreground">Price per person:</span>
-            <span className="font-semibold">${trekPrice}</span>
+            <span className="font-semibold">{formatCurrency(trekPrice)}</span>
           </div>
           <div className="flex justify-between items-center mb-2 text-sm">
             <span className="text-muted-foreground">Number of travelers:</span>
@@ -190,7 +193,7 @@ export const BookingForm = ({ trekName, trekPrice }: BookingFormProps) => {
           </div>
           <div className="border-t border-secondary/50 pt-2 flex justify-between items-center">
             <span className="font-display font-bold">Total Cost:</span>
-            <span className="font-display text-lg font-bold text-primary">${totalCost}</span>
+            <span className="font-display text-lg font-bold text-primary">{formatCurrency(totalCost)}</span>
           </div>
         </div>
 

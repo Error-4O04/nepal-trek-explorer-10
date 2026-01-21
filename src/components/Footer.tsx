@@ -28,6 +28,7 @@ export const Footer = () => {
               <li><a href="#" className="hover:text-primary-foreground transition-colors">Sustainability</a></li>
               <li><a href="#" className="hover:text-primary-foreground transition-colors">Contact</a></li>
             </ul>
+            <p className="text-xs text-primary-foreground/60 mt-3">A DEMO PROJECT MADE BY TEAM PARAGON</p>
           </div>
 
           {/* Connect */}

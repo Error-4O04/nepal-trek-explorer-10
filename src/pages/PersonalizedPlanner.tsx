@@ -1,10 +1,14 @@
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { TripPlanner } from '@/components/TripPlanner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const PersonalizedPlanner = () => {
   const [activeSection, setActiveSection] = useState('planner');
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -12,7 +16,7 @@ const PersonalizedPlanner = () => {
 
       {/* Main Content */}
       <div className="pt-16">
-        <TripPlanner />
+        <TripPlanner showAside={false} />
       </div>
 
       {/* Footer */}

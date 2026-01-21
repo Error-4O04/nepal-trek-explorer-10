@@ -8,6 +8,9 @@ import {
   Users, Baby, Heart, AlertTriangle, Star, Home
 } from 'lucide-react';
 import { destinationsService, DestinationWithDetails } from '../services/supabaseService';
+import { useCurrency } from '@/lib/CurrencyContext';
+import { Link } from 'react-router-dom';
+import React from 'react';
 
 interface UserPreferences {
   activities: string[];
@@ -25,8 +28,13 @@ interface UserPreferences {
   transport: string;
 }
 
-export const TripPlanner = () => {
+interface TripPlannerProps {
+  showAside?: boolean;
+}
+
+export const TripPlanner = ({ showAside = false }: TripPlannerProps) => {
   const [step, setStep] = useState<'activities' | 'preferences' | 'results'>('activities');
+  const { format: formatCurrency } = useCurrency();
   const [prefs, setPrefs] = useState<UserPreferences>({
     activities: [],
     naturePreference: [],
@@ -163,6 +171,19 @@ export const TripPlanner = () => {
   return (
     <section className="py-16 px-6 bg-gradient-to-b from-background to-card">
       <div className="container mx-auto max-w-6xl">
+        {showAside && (
+          <aside className="hidden lg:block fixed right-6 top-28 w-72 bg-card border border-border rounded-lg p-4">
+            <h4 className="font-semibold mb-2">Your Preferences</h4>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <div><span className="font-medium">Activities:</span> {prefs.activities.length > 0 ? prefs.activities.join(', ') : '—'}</div>
+              <div><span className="font-medium">Nature:</span> {prefs.naturePreference.length > 0 ? prefs.naturePreference.join(', ') : '—'}</div>
+              <div><span className="font-medium">Budget:</span> {prefs.budget}</div>
+              <div><span className="font-medium">Duration:</span> {prefs.duration} days</div>
+              <div><span className="font-medium">Travelers:</span> {prefs.travelers}</div>
+            </div>
+          </aside>
+        )}
+        {/* Right-side sticky preferences summary for larger screens (rendered only when showAside=true) */}
         <div className="text-center mb-12">
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">
             Plan Your Perfect Trip
@@ -172,6 +193,7 @@ export const TripPlanner = () => {
           </p>
         </div>
 
+        <div className="bg-muted/10 p-6 rounded-xl border border-border/50">
         {/* Step 1: Activities */}
         {step === 'activities' && (
           <div className="space-y-8">
@@ -216,6 +238,7 @@ export const TripPlanner = () => {
             </Button>
           </div>
         )}
+        </div>
 
         {/* Step 2: Preferences */}
         {step === 'preferences' && (
@@ -270,20 +293,34 @@ export const TripPlanner = () => {
               <CardContent className="space-y-6">
                 <div>
                   <label className="text-sm font-medium mb-3 block">Estimated Budget</label>
-                  <div className="flex gap-4">
-                    {(['low', 'medium', 'high'] as const).map(b => (
-                      <button
-                        key={b}
-                        onClick={() => setPrefs(p => ({ ...p, budget: b }))}
-                        className={`px-4 py-2 rounded-lg border-2 transition-all capitalize ${
-                          prefs.budget === b
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                      >
-                        {b === 'low' ? '💰' : b === 'medium' ? '💰💰' : '💰💰💰'} {b}
-                      </button>
-                    ))}
+                  <div className="flex flex-col gap-3">
+                    {(['low', 'medium', 'high'] as const).map(b => {
+                      const ranges: Record<'low' | 'medium' | 'high', [number, number | null, string]> = {
+                        low: [5000, 15000, 'Budget-friendly accommodations & local transport'],
+                        medium: [15001, 40000, 'Mid-range hotels, guided tours & comfort'],
+                        high: [40001, null, 'Luxury stays, private guides & premium experiences'],
+                      };
+                      const [min, max, desc] = ranges[b];
+                      return (
+                        <button
+                          key={b}
+                          onClick={() => setPrefs(p => ({ ...p, budget: b }))}
+                          className={`p-4 rounded-lg border-2 transition-all text-left ${
+                            prefs.budget === b
+                              ? 'border-primary bg-primary/10'
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="capitalize font-semibold">{b === 'low' ? '💰' : b === 'medium' ? '💰💰' : '💰💰💰'} {b}</p>
+                              <p className="text-xs text-muted-foreground mt-1">{desc}</p>
+                            </div>
+                            <p className="text-sm font-medium">{formatCurrency(min)} {max ? `- ${formatCurrency(max)}` : '+'}/day</p>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -540,7 +577,7 @@ export const TripPlanner = () => {
                             <DollarSign className="w-3 h-3" /> Cost (per person)
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            ₹{dest.cost_budget} - ₹{dest.cost_luxury}
+                            {formatCurrency(dest.cost_budget)} - {formatCurrency(dest.cost_luxury)}
                           </p>
                         </div>
 
@@ -551,8 +588,17 @@ export const TripPlanner = () => {
                           {dest.group_friendly && <p className="text-green-600">✓ Group friendly</p>}
                         </div>
 
-                        <Button className="w-full mt-2" size="sm">
-                          Learn More
+                        <Button
+                          className="w-full mt-2"
+                          size="sm"
+                          asChild
+                        >
+                          <Link
+                            to={`/destination/${dest.id}`}
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                          >
+                            Learn More
+                          </Link>
                         </Button>
                       </CardContent>
                     </Card>

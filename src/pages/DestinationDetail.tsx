@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { destinationsService, DestinationWithDetails } from '@/services/supabaseService';
+import { useCurrency } from '@/lib/CurrencyContext';
 
 const DestinationDetail = () => {
   const { id } = useParams();
@@ -32,6 +33,8 @@ const DestinationDetail = () => {
   const [activeSection, setActiveSection] = useState('hero');
   const [destination, setDestination] = useState<DestinationWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const { format: formatCurrency } = useCurrency();
 
   // Fetch destination from Supabase
   useEffect(() => {
@@ -326,7 +329,7 @@ const DestinationDetail = () => {
                     <p className="text-sm text-muted-foreground mb-2">Cost Range</p>
                     <div className="flex items-center gap-2">
                       <span className="font-display font-bold text-primary">
-                        ₹{destination.cost_budget.toLocaleString()} - ₹{destination.cost_luxury.toLocaleString()}
+                        {formatCurrency(destination.cost_budget)} - {formatCurrency(destination.cost_luxury)}
                       </span>
                     </div>
                   </div>

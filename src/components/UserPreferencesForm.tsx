@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MapPin, DollarSign, Calendar, Users, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { useCurrency } from '@/lib/CurrencyContext';
 import type { NaturePreference, BudgetLevel, TravelStyle, GroupType, ActivityType } from '@/data/destinations';
 
 export interface UserPreferences {
@@ -42,6 +43,8 @@ export const UserPreferencesForm = ({ onSubmit, selectedActivities }: UserPrefer
     crowdPreference: 'peak',
     interests: [],
   });
+
+  const { format: formatCurrency } = useCurrency();
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const interestOptions = ['Photography', 'Bird Watching', 'Culture & Festivals', 'Adventure', 'Relaxation', 'Local Cuisine', 'Art & History'];
@@ -158,9 +161,9 @@ export const UserPreferencesForm = ({ onSubmit, selectedActivities }: UserPrefer
         <p className="text-muted-foreground text-sm">Select your estimated budget per day</p>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { id: 'low', label: '💰 Budget', desc: 'Under $30/day' },
-            { id: 'medium', label: '💵 Medium', desc: '$30-100/day' },
-            { id: 'high', label: '💎 Luxury', desc: '$100+/day' },
+            { id: 'low', label: `💰 Low (${formatCurrency(5000)} - ${formatCurrency(15000)})`, desc: `Approx ${formatCurrency(5000)} - ${formatCurrency(15000)} per day` },
+            { id: 'medium', label: `💵 Medium (${formatCurrency(15001)} - ${formatCurrency(40000)})`, desc: `Approx ${formatCurrency(15001)} - ${formatCurrency(40000)} per day` },
+            { id: 'high', label: `💎 High (${formatCurrency(40001)}+)`, desc: `Approx ${formatCurrency(40001)} and above per day` },
           ].map((budget) => (
             <label key={budget.id} className="relative">
               <input

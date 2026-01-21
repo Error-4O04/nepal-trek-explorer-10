@@ -34,8 +34,8 @@ export const DiscoverTreks = () => {
   const difficultyOptions: { value: Difficulty; label: string; icon: React.ReactNode }[] = [
     { value: 'All', label: 'All Levels', icon: <Sparkles className="w-4 h-4" /> },
     { value: 'Easy', label: 'Easy', icon: <span className="text-lg">🌿</span> },
-    { value: 'Moderate', label: 'Moderate', icon: <span className="text-lg">🏔️</span> },
-    { value: 'Challenging', label: 'Challenging', icon: <span className="text-lg">⛰️</span> },
+    { value: 'Moderate', label: 'Moderate', icon: <span className="text-lg">🧗‍♂️</span> },
+    { value: 'Challenging', label: 'Challenging', icon: <span className="text-lg">🏔️</span> },
   ];
 
   const vibeOptions: { value: Vibe; label: string; icon: React.ReactNode }[] = [

@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import { Hero } from '@/components/Hero';
 import { DiscoverTreks } from '@/components/DiscoverTreks';
@@ -22,16 +23,33 @@ const Index = () => {
       community: communityRef,
     };
 
-    if (section === 'hero') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (refs[section]?.current) {
-      refs[section].current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Small delay to ensure state updates and DOM are ready
+    setTimeout(() => {
+      if (section === 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (refs[section]?.current) {
+        refs[section].current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   };
 
   const handleExplore = () => {
     handleNavigate('discover');
   };
+
+  const location = useLocation();
+
+  // If navigated here with state indicating a section to scroll to, do it.
+  useEffect(() => {
+    const state: any = (location && (location as any).state) || {};
+    if (state && state.scrollTo) {
+      const section = state.scrollTo as string;
+      // small timeout to allow DOM to render
+      setTimeout(() => handleNavigate(section), 50);
+      // clear history state to avoid repeated scrolling
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   return (
     <div className="min-h-screen bg-background">

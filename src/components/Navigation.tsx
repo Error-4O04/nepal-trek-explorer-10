@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Mountain, Menu, X, Compass, Calendar, Users, History } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useCurrency } from '@/lib/CurrencyContext';
 
 interface NavigationProps {
   activeSection: string;
@@ -13,7 +14,7 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
 
   const navItems = [
     { id: 'discover', label: 'Discover', icon: Compass, path: '/#discover' },
-    { id: 'trip-planner', label: 'Trip Planner', icon: Calendar, path: '/planner' },
+    { id: 'planner', label: 'Trip Planner', icon: Calendar, path: '/planner' },
     { id: 'community', label: 'Community', icon: Users, path: '/#community' },
     { id: 'activity-log', label: 'Activity Log', icon: History, path: '/activity-log' },
   ];
@@ -23,6 +24,47 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
     setMobileMenuOpen(false);
   };
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleItemClick = (e: React.MouseEvent, item: { id: string; path: string }) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+
+    // Anchors that live on the home page - use smooth scroll animation
+    if (item.id === 'discover' || item.id === 'community') {
+      if (location.pathname === '/') {
+        // Already on home - scroll smoothly to section
+        onNavigate(item.id);
+      } else {
+        // On another page - navigate to home with scroll state
+        navigate('/', { state: { scrollTo: item.id } });
+      }
+      return;
+    }
+
+    // Route-based navigation - snap to top
+    if (item.id === 'planner') {
+      if (location.pathname === '/planner') {
+        onNavigate('planner');
+      } else {
+        navigate('/planner');
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+      return;
+    }
+
+    if (item.id === 'activity-log') {
+      if (location.pathname === '/activity-log') {
+        onNavigate('activity-log');
+      } else {
+        navigate('/activity-log');
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+      return;
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
       <div className="container mx-auto px-6">
@@ -30,6 +72,12 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
           {/* Logo */}
           <Link
             to="/"
+            onClick={(e) => {
+              if (location.pathname === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
             className="flex items-center gap-2 font-display text-xl font-bold text-primary hover:opacity-80 transition-opacity"
           >
             <Mountain className="w-7 h-7" />
@@ -39,7 +87,12 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
-              <a key={item.id} href={item.path} className="no-underline">
+              <a
+                key={item.id}
+                href={item.path}
+                className="no-underline"
+                onClick={(e) => handleItemClick(e, item)}
+              >
                 <Button
                   variant={activeSection === item.id ? 'default' : 'ghost'}
                   size="sm"
@@ -50,6 +103,10 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
                 </Button>
               </a>
             ))}
+            {/* Currency Switcher */}
+            <div className="ml-4">
+              <CurrencySwitcher />
+            </div>
           </div>
 
 
@@ -68,7 +125,12 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
           <div className="md:hidden py-4 border-t border-border/50 animate-fade-in">
             <div className="flex flex-col gap-2">
               {navItems.map((item) => (
-                <a key={item.id} href={item.path} className="no-underline">
+                <a
+                  key={item.id}
+                  href={item.path}
+                  className="no-underline"
+                  onClick={(e) => handleItemClick(e, item)}
+                >
                   <Button
                     variant={activeSection === item.id ? 'default' : 'ghost'}
                     className="justify-start gap-3 w-full"
@@ -83,5 +145,23 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
         )}
       </div>
     </nav>
+  );
+};
+
+const CurrencySwitcher = () => {
+  const { currency, setCurrency } = useCurrency();
+  return (
+    <select
+      value={currency}
+      onChange={(e) => setCurrency(e.target.value as any)}
+      className="px-3 py-1 rounded-md border border-border bg-background text-foreground"
+    >
+      <option value="NPR">NPR</option>
+      <option value="INR">INR</option>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="GBP">GBP</option>
+      <option value="AUD">AUD</option>
+    </select>
   );
 };

@@ -26,7 +26,18 @@ export const TravelAgencies = ({ trekSpecializations = [] }: TravelAgenciesProps
     : travelAgencies.slice(0, 5);
 
   const handleContact = (agency: TravelAgency) => {
-    window.location.href = `mailto:${agency.email}?subject=Booking Inquiry`;
+    const subject = encodeURIComponent(`Booking Inquiry for ${agency.name}`);
+    const to = encodeURIComponent(agency.email);
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}`;
+    window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleWebsite = (website: string) => {
+    let url = website || '';
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -127,13 +138,11 @@ export const TravelAgencies = ({ trekSpecializations = [] }: TravelAgenciesProps
               <Button
                 variant="outline"
                 size="sm"
-                asChild
+                onClick={() => handleWebsite(agency.website)}
                 className="flex-1 gap-2"
               >
-                <a href={agency.website} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4" />
-                  Website
-                </a>
+                <ExternalLink className="w-4 h-4" />
+                Website
               </Button>
             </div>
           </div>
