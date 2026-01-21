@@ -130,7 +130,7 @@ const DestinationDetail = () => {
       {/* Hero Section */}
       <div className="relative h-96 md:h-[500px] w-full overflow-hidden mt-16">
         <img
-          src={destination.image_url}
+          src={destination.image_detail_url || destination.image_url}
           alt={destination.name}
           className="w-full h-full object-cover"
         />

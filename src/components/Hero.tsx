@@ -57,10 +57,6 @@ export const Hero = ({ onExplore }: HeroProps) => {
               <div className="text-sm text-muted-foreground">Happy Trekkers</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-display font-bold text-secondary">15,000</div>
-              <div className="text-sm text-muted-foreground">Trees Planted</div>
-            </div>
-            <div className="text-center">
               <div className="text-3xl font-display font-bold text-accent">50+</div>
               <div className="text-sm text-muted-foreground">Unique Routes</div>
             </div>

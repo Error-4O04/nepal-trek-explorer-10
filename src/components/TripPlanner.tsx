@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import {
   MapPin, DollarSign, Zap, AlertCircle, Check, TreePine, Waves,
   Users, Baby, Heart, AlertTriangle, Star, Home
 } from 'lucide-react';
+import { destinationsService, DestinationWithDetails } from '../services/supabaseService';
 
 interface UserPreferences {
   activities: string[];
@@ -22,28 +23,6 @@ interface UserPreferences {
   season: 'peak' | 'off-season';
   interests: string[];
   transport: string;
-}
-
-interface Recommendation {
-  name: string;
-  location: string;
-  image: string;
-  difficulty: string;
-  duration: number;
-  altitude: string;
-  rating: number;
-  eco_score: number;
-  carbon_footprint: string;
-  cost_budget: number;
-  cost_medium: number;
-  cost_luxury: number;
-  activities: string[];
-  accommodations: string[];
-  sustainableTips: string[];
-  warnings: string[];
-  groupFriendly: boolean;
-  childrenFriendly: boolean;
-  elderlyFriendly: boolean;
 }
 
 export const TripPlanner = () => {
@@ -64,7 +43,18 @@ export const TripPlanner = () => {
     transport: 'bus',
   });
 
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<DestinationWithDetails[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [allDestinations, setAllDestinations] = useState<DestinationWithDetails[]>([]);
+
+  // Fetch destinations on mount
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      const data = await destinationsService.getAll();
+      setAllDestinations(data);
+    };
+    fetchDestinations();
+  }, []);
 
   const activities = [
     { id: 'trekking', label: 'Trekking', icon: Mountain },
@@ -116,54 +106,58 @@ export const TripPlanner = () => {
   };
 
   const handleGenerateRecommendations = () => {
-    // Mock recommendations based on preferences
-    const mockRecommendations: Recommendation[] = [
-      {
-        name: 'Langtang Valley Trek',
-        location: 'Langtang National Park',
-        image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800',
-        difficulty: 'Moderate',
-        duration: 7,
-        altitude: '3870m',
-        rating: 4.8,
-        eco_score: 82,
-        carbon_footprint: 'low',
-        cost_budget: 700,
-        cost_medium: 1000,
-        cost_luxury: 1600,
-        activities: ['Trekking', 'Photography', 'Culture'],
-        accommodations: ['Teahouse', 'Eco-Lodge', 'Community Homestay'],
-        sustainableTips: ['Use local guides', 'Stay in community lodges', 'Carry out all trash', 'Respect wildlife'],
-        warnings: ['High altitude - acclimatization needed', 'Weather can change rapidly', 'Limited medical facilities'],
-        groupFriendly: true,
-        childrenFriendly: false,
-        elderlyFriendly: false,
-      },
-      {
-        name: 'Pokhara Lake & Mountain Views',
-        location: 'Pokhara',
-        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-        difficulty: 'Easy',
-        duration: 3,
-        altitude: '822m',
-        rating: 4.7,
-        eco_score: 72,
-        carbon_footprint: 'low',
-        cost_budget: 400,
-        cost_medium: 800,
-        cost_luxury: 1500,
-        activities: ['Sightseeing', 'Boat', 'Photography'],
-        accommodations: ['Hotel', 'Guesthouse', 'Lakeside Resort'],
-        sustainableTips: ['Use eco-friendly boat tours', 'Support local cafes', 'No plastic bags'],
-        warnings: ['Crowded during peak season', 'Air quality during winter'],
-        groupFriendly: true,
-        childrenFriendly: true,
-        elderlyFriendly: true,
-      },
-    ];
+    setLoading(true);
+    
+    // Filter destinations based on user preferences
+    const filtered = allDestinations.filter((dest) => {
+      // Check difficulty compatibility
+      const difficultyMatch = 
+        prefs.duration <= 3 ? dest.difficulty === 'Easy' :
+        prefs.duration <= 10 ? dest.difficulty !== 'Challenging' :
+        true;
 
-    setRecommendations(mockRecommendations);
+      // Check group friendly
+      const groupMatch = 
+        prefs.hasChildren ? dest.children_friendly :
+        prefs.hasElderly ? dest.elderly_friendly :
+        true;
+
+      // Check budget compatibility
+      const budgetCost = 
+        prefs.budget === 'low' ? dest.cost_budget :
+        prefs.budget === 'medium' ? dest.cost_medium :
+        dest.cost_luxury;
+
+      // Check vibes match nature preferences
+      const vibesMatch = 
+        prefs.naturePreference.length === 0 ||
+        (dest.vibes && dest.vibes.length > 0 &&
+          prefs.naturePreference.some(pref => {
+            if (pref === 'mountains') return true;
+            if (pref === 'forests') return true;
+            if (pref === 'lakes') return true;
+            return false;
+          }));
+
+      // Check eco-score for eco-friendly preference
+      const ecoMatch = 
+        prefs.travelStyle === 'eco-friendly' ? dest.eco_score >= 70 :
+        true;
+
+      return difficultyMatch && groupMatch && vibesMatch && ecoMatch;
+    });
+
+    // Sort by rating and eco-score
+    const sorted = filtered.sort((a, b) => {
+      if (prefs.travelStyle === 'eco-friendly') {
+        return b.eco_score - a.eco_score;
+      }
+      return b.rating - a.rating;
+    });
+
+    setRecommendations(sorted.slice(0, 6)); // Show top 6 recommendations
     setStep('results');
+    setLoading(false);
   };
 
   return (
@@ -462,175 +456,134 @@ export const TripPlanner = () => {
         {/* Step 3: Results */}
         {step === 'results' && (
           <div className="space-y-8">
-            {recommendations.length > 0 && (
+            {loading ? (
+              <div className="text-center py-16">
+                <div className="inline-block">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+                <p className="text-muted-foreground mt-4">Finding perfect destinations...</p>
+              </div>
+            ) : recommendations.length > 0 ? (
               <>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {recommendations.map((rec, idx) => (
-                    <Card key={idx} className="overflow-hidden hover:shadow-elevated transition-shadow">
-                      <div className="relative h-48 overflow-hidden">
+                <div>
+                  <h3 className="text-2xl font-bold mb-4">Your Personalized Recommendations</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Based on your preferences, we found {recommendations.length} destinations that match your interests.
+                  </p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recommendations.map((dest) => (
+                    <Card key={dest.id} className="overflow-hidden hover:shadow-elevated transition-shadow">
+                      <div className="relative h-40 overflow-hidden">
                         <img
-                          src={rec.image}
-                          alt={rec.name}
+                          src={dest.image_url}
+                          alt={dest.name}
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold">
-                          ⭐ {rec.rating}
+                          ⭐ {dest.rating}
                         </div>
                       </div>
 
-                      <CardContent className="p-6 space-y-4">
+                      <CardContent className="p-4 space-y-3">
                         <div>
-                          <h3 className="font-display text-2xl font-bold mb-1">{rec.name}</h3>
-                          <p className="text-muted-foreground flex items-center gap-1">
-                            <MapPin className="w-4 h-4" /> {rec.location}
+                          <h3 className="font-display text-lg font-bold">{dest.name}</h3>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <MapPin className="w-4 h-4" /> {dest.location}
                           </p>
                         </div>
 
                         {/* Quick Stats */}
-                        <div className="grid grid-cols-3 gap-2 py-3 border-y">
+                        <div className="grid grid-cols-3 gap-2 py-2 border-y text-xs">
                           <div className="text-center">
-                            <p className="text-xs text-muted-foreground">Duration</p>
-                            <p className="font-semibold">{rec.duration} days</p>
+                            <p className="text-muted-foreground">Difficulty</p>
+                            <p className="font-semibold">{dest.difficulty}</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-xs text-muted-foreground">Altitude</p>
-                            <p className="font-semibold">{rec.altitude}</p>
+                            <p className="text-muted-foreground">Altitude</p>
+                            <p className="font-semibold">{dest.altitude}</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-xs text-muted-foreground">Difficulty</p>
-                            <p className="font-semibold text-sm">{rec.difficulty}</p>
+                            <p className="text-muted-foreground">Eco Score</p>
+                            <p className="font-semibold text-green-600">{dest.eco_score}</p>
                           </div>
                         </div>
 
-                        {/* Eco-Friendliness Score */}
-                        <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg">
-                          <p className="text-sm font-semibold flex items-center gap-2 mb-2">
-                            <Leaf className="w-4 h-4 text-green-600" />
-                            Eco-Friendliness Score
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 bg-green-200 h-2 rounded-full overflow-hidden">
-                              <div
-                                className="bg-green-600 h-full"
-                                style={{ width: `${rec.eco_score}%` }}
-                              />
+                        {/* Vibes */}
+                        {dest.vibes && dest.vibes.length > 0 && (
+                          <div>
+                            <p className="text-xs font-semibold mb-2">Mood / Vibe</p>
+                            <div className="flex flex-wrap gap-1">
+                              {dest.vibes.map((vibe) => (
+                                <Badge key={vibe} variant="secondary" className="text-xs">
+                                  {vibe}
+                                </Badge>
+                              ))}
                             </div>
-                            <span className="font-bold text-green-700">{rec.eco_score}/100</span>
                           </div>
-                        </div>
+                        )}
 
                         {/* Carbon Footprint */}
                         <div>
-                          <p className="text-sm font-semibold flex items-center gap-2 mb-2">
-                            <Zap className="w-4 h-4" />
-                            Carbon Footprint
+                          <p className="text-xs font-semibold mb-1 flex items-center gap-1">
+                            <Zap className="w-3 h-3" /> Carbon
                           </p>
-                          <Badge className={rec.carbon_footprint === 'low' ? 'bg-green-600' : rec.carbon_footprint === 'medium' ? 'bg-yellow-600' : 'bg-red-600'}>
-                            {rec.carbon_footprint === 'low' ? '🟢' : rec.carbon_footprint === 'medium' ? '🟡' : '🔴'} {rec.carbon_footprint.toUpperCase()}
+                          <Badge className={dest.carbon_footprint === 'low' ? 'bg-green-600 text-xs' : dest.carbon_footprint === 'medium' ? 'bg-yellow-600 text-xs' : 'bg-red-600 text-xs'}>
+                            {dest.carbon_footprint}
                           </Badge>
                         </div>
 
-                        {/* Cost Breakdown */}
+                        {/* Cost Range */}
                         <div>
-                          <p className="text-sm font-semibold flex items-center gap-2 mb-2">
-                            <DollarSign className="w-4 h-4" />
-                            Estimated Cost (per person)
+                          <p className="text-xs font-semibold mb-1 flex items-center gap-1">
+                            <DollarSign className="w-3 h-3" /> Cost (per person)
                           </p>
-                          <div className="space-y-1 text-sm">
-                            <p>💰 Budget: ₹{rec.cost_budget.toLocaleString()}</p>
-                            <p>💰💰 Medium: ₹{rec.cost_medium.toLocaleString()}</p>
-                            <p>💰💰💰 Luxury: ₹{rec.cost_luxury.toLocaleString()}</p>
-                          </div>
-                        </div>
-
-                        {/* Activities */}
-                        <div>
-                          <p className="text-sm font-semibold mb-2">Activities</p>
-                          <div className="flex flex-wrap gap-1">
-                            {rec.activities.map(act => (
-                              <Badge key={act} variant="secondary" className="text-xs">
-                                {act}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Accommodations */}
-                        <div>
-                          <p className="text-sm font-semibold mb-2 flex items-center gap-1">
-                            <Home className="w-4 h-4" /> Accommodations
+                          <p className="text-xs text-muted-foreground">
+                            ₹{dest.cost_budget} - ₹{dest.cost_luxury}
                           </p>
-                          <div className="space-y-1 text-sm">
-                            {rec.accommodations.map(acc => (
-                              <p key={acc}>• {acc}</p>
-                            ))}
-                          </div>
                         </div>
 
-                        {/* Group & Accessibility */}
-                        <div>
-                          <p className="text-sm font-semibold mb-2 flex items-center gap-1">
-                            <Users className="w-4 h-4" /> Group & Accessibility
-                          </p>
-                          <div className="space-y-1 text-sm">
-                            {rec.groupFriendly && <p>✅ Group Friendly</p>}
-                            {rec.childrenFriendly && <p>✅ Children Friendly</p>}
-                            {rec.elderlyFriendly && <p>✅ Elderly Friendly</p>}
-                          </div>
+                        {/* Group Compatibility */}
+                        <div className="text-xs space-y-1">
+                          {prefs.hasChildren && dest.children_friendly && <p className="text-green-600">✓ Good for children</p>}
+                          {prefs.hasElderly && dest.elderly_friendly && <p className="text-green-600">✓ Accessible for elderly</p>}
+                          {dest.group_friendly && <p className="text-green-600">✓ Group friendly</p>}
                         </div>
 
-                        {/* Sustainable Tips */}
-                        <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg">
-                          <p className="text-sm font-semibold mb-2 flex items-center gap-1">
-                            <Leaf className="w-4 h-4" /> Sustainable Travel Tips
-                          </p>
-                          <ul className="space-y-1 text-sm">
-                            {rec.sustainableTips.map((tip, i) => (
-                              <li key={i} className="flex items-start gap-2">
-                                <Check className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
-                                <span>{tip}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* Warnings */}
-                        {rec.warnings.length > 0 && (
-                          <div className="bg-amber-50 dark:bg-amber-950 p-4 rounded-lg">
-                            <p className="text-sm font-semibold mb-2 flex items-center gap-1 text-amber-800 dark:text-amber-200">
-                              <AlertTriangle className="w-4 h-4" /> Important Notes
-                            </p>
-                            <ul className="space-y-1 text-sm text-amber-900 dark:text-amber-100">
-                              {rec.warnings.map((warning, i) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                                  <span>{warning}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                        <Button className="w-full mt-2" size="sm">
+                          Learn More
+                        </Button>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 justify-center">
                   <Button
                     variant="outline"
                     onClick={() => setStep('preferences')}
-                    className="w-full md:w-auto"
                   >
                     ← Modify Preferences
                   </Button>
                   <Button
                     onClick={() => setStep('activities')}
-                    className="w-full md:w-auto"
                   >
                     Start Over
                   </Button>
                 </div>
               </>
+            ) : (
+              <div className="text-center py-16">
+                <Mountain className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-xl font-display font-semibold mb-2">No matching destinations found</h3>
+                <p className="text-muted-foreground mb-4">
+                  Try adjusting your preferences to discover more adventures
+                </p>
+                <Button onClick={() => setStep('preferences')}>
+                  Modify Preferences
+                </Button>
+              </div>
             )}
           </div>
         )}

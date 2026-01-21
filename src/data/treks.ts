@@ -158,24 +158,21 @@ export const treks: Trek[] = [
 export const ngos = [
   {
     id: '1',
-    name: 'Trees for Nepal',
-    description: 'Planting native trees in deforested Himalayan regions',
-    treeCost: 2,
-    logo: '🌳',
-  },
-  {
-    id: '2',
     name: 'Nepal Wildlife Trust',
     description: 'Protecting endangered species and their habitats',
-    treeCost: 3,
     logo: '🐅',
   },
   {
-    id: '3',
+    id: '2',
     name: 'Himalayan Climate Initiative',
     description: 'Supporting sustainable tourism and climate action',
-    treeCost: 2.5,
     logo: '🏔️',
+  },
+  {
+    id: '3',
+    name: 'Local Community Foundation',
+    description: 'Empowering local communities through education and conservation',
+    logo: '🤝',
   },
 ];
 

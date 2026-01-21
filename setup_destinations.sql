@@ -25,6 +25,7 @@ CREATE TABLE destinations (
   children_friendly BOOLEAN DEFAULT true,
   elderly_friendly BOOLEAN DEFAULT true,
   accessibility_notes TEXT,
+  vibes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -36,7 +37,7 @@ INSERT INTO destinations (
   carbon_score, carbon_footprint, eco_score,
   cost_budget, cost_medium, cost_luxury,
   is_hidden_gem, group_friendly, children_friendly, elderly_friendly,
-  accessibility_notes
+  accessibility_notes, vibes
 ) VALUES
 (
   'Kathmandu Valley Heritage Tour',
@@ -49,7 +50,8 @@ INSERT INTO destinations (
   40, 'low', 65,
   300, 600, 1200,
   false, true, true, true,
-  'Good infrastructure in city center, stairs at temples'
+  'Good infrastructure in city center, stairs at temples',
+  '["Cultural"]'
 ),
 (
   'Pokhara Lake & Mountain Views',
@@ -62,7 +64,8 @@ INSERT INTO destinations (
   35, 'low', 72,
   400, 800, 1500,
   false, true, true, true,
-  'Lakeside paths are accessible, some lakeside hotels have steps'
+  'Lakeside paths are accessible, some lakeside hotels have steps',
+  '["Peaceful", "Adventure"]'
 ),
 (
   'Langtang Valley Trek',
@@ -75,7 +78,8 @@ INSERT INTO destinations (
   45, 'low', 82,
   700, 1000, 1600,
   true, true, false, false,
-  'High altitude trek, not suitable for reduced mobility'
+  'High altitude trek, not suitable for reduced mobility',
+  '["Peaceful", "Cultural"]'
 ),
 (
   'Chitwan National Park Safari',
@@ -88,7 +92,8 @@ INSERT INTO destinations (
   60, 'medium', 78,
   400, 800, 1800,
   false, true, true, true,
-  'Jeep safari accessible, lodge accommodations available'
+  'Jeep safari accessible, lodge accommodations available',
+  '["Wildlife", "Adventure"]'
 ),
 (
   'Phewa Lake Light Walk',
@@ -101,7 +106,8 @@ INSERT INTO destinations (
   30, 'low', 85,
   150, 300, 500,
   false, true, true, true,
-  'Fully accessible lakeside paths, easy terrain'
+  'Fully accessible lakeside paths, easy terrain',
+  '["Peaceful"]'
 ),
 (
   'Khopra Ridge Trek',
@@ -114,7 +120,8 @@ INSERT INTO destinations (
   50, 'low', 88,
   600, 900, 1400,
   true, true, false, false,
-  'Remote mountain trek, challenging terrain'
+  'Remote mountain trek, challenging terrain',
+  '["Peaceful", "Wildlife"]'
 ),
 (
   'Everest Base Camp Trek',
@@ -127,7 +134,8 @@ INSERT INTO destinations (
   55, 'medium', 75,
   1200, 1800, 2800,
   false, true, false, false,
-  'High altitude, acclimatization required'
+  'High altitude, acclimatization required',
+  '["Adventure"]'
 ),
 (
   'Annapurna Base Camp Trek',
@@ -140,7 +148,8 @@ INSERT INTO destinations (
   48, 'low', 80,
   900, 1400, 2200,
   false, true, false, false,
-  'Well-maintained trails, teahouse accommodations'
+  'Well-maintained trails, teahouse accommodations',
+  '["Adventure", "Peaceful"]'
 ),
 (
   'Manaslu Circuit Trek',
@@ -153,7 +162,8 @@ INSERT INTO destinations (
   52, 'low', 82,
   1000, 1600, 2400,
   true, false, false, false,
-  'Remote, requires permits and guides'
+  'Remote, requires permits and guides',
+  '["Adventure", "Cultural"]'
 ),
 (
   'Dhaulagiri Circuit',
@@ -166,7 +176,8 @@ INSERT INTO destinations (
   55, 'low', 85,
   1100, 1700, 2600,
   true, false, false, false,
-  'Very remote, experienced trekkers only'
+  'Very remote, experienced trekkers only',
+  '["Adventure"]'
 ),
 (
   'Makalu Base Camp Trek',
@@ -179,7 +190,8 @@ INSERT INTO destinations (
   54, 'low', 84,
   1000, 1500, 2300,
   true, false, false, false,
-  'Remote location, limited facilities'
+  'Remote location, limited facilities',
+  '["Adventure"]'
 ),
 (
   'Milun Lakes Trek',
@@ -192,7 +204,8 @@ INSERT INTO destinations (
   46, 'low', 86,
   750, 1200, 1900,
   true, true, false, false,
-  'Less crowded, teahouse lodges available'
+  'Less crowded, teahouse lodges available',
+  '["Peaceful", "Adventure"]'
 ),
 (
   'Gokyo Lakes Trek',
@@ -205,7 +218,8 @@ INSERT INTO destinations (
   48, 'low', 81,
   900, 1350, 2100,
   false, true, false, false,
-  'High altitude, acclimatization necessary'
+  'High altitude, acclimatization necessary',
+  '["Adventure", "Peaceful"]'
 ),
 (
   'Rara Lake Trek',
@@ -218,7 +232,8 @@ INSERT INTO destinations (
   42, 'low', 87,
   700, 1100, 1700,
   true, true, false, false,
-  'Very remote, basic accommodations'
+  'Very remote, basic accommodations',
+  '["Peaceful"]'
 ),
 (
   'Panch Pokhari Trek',
@@ -231,7 +246,8 @@ INSERT INTO destinations (
   43, 'low', 88,
   600, 950, 1500,
   true, true, false, false,
-  'Less popular, pristine nature'
+  'Less popular, pristine nature',
+  '["Cultural", "Adventure"]'
 ),
 (
   'Trekking to Gosaikunda Lake',
@@ -244,7 +260,8 @@ INSERT INTO destinations (
   44, 'low', 83,
   550, 900, 1400,
   false, true, false, false,
-  'Popular pilgrimage site, crowded seasons'
+  'Popular pilgrimage site, crowded seasons',
+  '["Cultural", "Peaceful"]'
 ),
 (
   'Baglung Parbat Trek',
@@ -257,7 +274,8 @@ INSERT INTO destinations (
   41, 'low', 80,
   500, 800, 1300,
   true, true, true, false,
-  'Very off-the-beaten path, few services'
+  'Very off-the-beaten path, few services',
+  '["Cultural"]'
 ),
 (
   'Tamang Heritage Trail',
@@ -270,7 +288,8 @@ INSERT INTO destinations (
   32, 'low', 82,
   400, 700, 1200,
   false, true, true, true,
-  'Homestay accommodations, cultural immersion'
+  'Homestay accommodations, cultural immersion',
+  '["Cultural"]'
 ),
 (
   'Kanyam & Dhulikhel Heritage Trek',
@@ -283,7 +302,8 @@ INSERT INTO destinations (
   28, 'low', 85,
   300, 550, 900,
   false, true, true, true,
-  'Close to Kathmandu, cultural sites'
+  'Close to Kathmandu, cultural sites',
+  '["Cultural"]'
 ),
 (
   'Upper Dolpo Trek',
@@ -296,7 +316,8 @@ INSERT INTO destinations (
   57, 'low', 89,
   1300, 1900, 2800,
   true, false, false, false,
-  'Extremely remote, guides mandatory'
+  'Extremely remote, guides mandatory',
+  '["Adventure", "Cultural"]'
 ),
 (
   'Rolwaling Valley Trek',
@@ -309,7 +330,8 @@ INSERT INTO destinations (
   49, 'low', 81,
   800, 1300, 2000,
   true, true, false, false,
-  'Less crowded, beautiful scenery'
+  'Less crowded, beautiful scenery',
+  '["Adventure"]'
 ),
 (
   'Jomolhari Trek',
@@ -322,7 +344,8 @@ INSERT INTO destinations (
   53, 'low', 83,
   1100, 1700, 2500,
   true, false, false, false,
-  'Cross-border trek, permits required'
+  'Cross-border trek, permits required',
+  '["Adventure"]'
 ),
 (
   'Kangchenjunga Trek',
@@ -335,7 +358,8 @@ INSERT INTO destinations (
   56, 'low', 84,
   1400, 2000, 3000,
   true, false, false, false,
-  'Very remote, experienced trekkers only'
+  'Very remote, experienced trekkers only',
+  '["Adventure", "Wildlife"]'
 );
 
 -- Create index for better query performance

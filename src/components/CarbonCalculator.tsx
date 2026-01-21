@@ -24,7 +24,6 @@ export const CarbonCalculator = () => {
   const accommodationCO2 = accommodationFactors[accommodation] * 10; // days * factor
   const trekCO2 = selectedTrek ? (treks.find(t => t.id === selectedTrek)?.carbonScore || 0) : 30;
   const totalCO2 = flightCO2 + accommodationCO2 + trekCO2;
-  const treesToPlant = Math.ceil(totalCO2 / 21); // Average tree absorbs 21kg CO2/year
 
   const handleCalculate = () => {
     setCalculated(true);
@@ -171,38 +170,14 @@ export const CarbonCalculator = () => {
                   </CardContent>
                 </Card>
 
-                {/* Offset Recommendation */}
-                <Card className="shadow-card border-primary/20 bg-primary/5 animate-scale-in" style={{ animationDelay: '0.1s' }}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 rounded-full bg-primary/10">
-                        <TreePine className="w-8 h-8 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-display text-xl font-semibold mb-2">
-                          Offset Recommendation
-                        </h3>
-                        <p className="text-muted-foreground mb-3">
-                          Plant <span className="font-bold text-primary">{treesToPlant} trees</span> to offset your carbon footprint over one year.
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Estimated cost: ${(treesToPlant * 2.5).toFixed(0)} - ${(treesToPlant * 5).toFixed(0)}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-
-            {/* Partner NGOs */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="font-display text-xl flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-secondary" />
-                  Partner Organizations
-                </CardTitle>
-              </CardHeader>
+                {/* Partner NGOs */}
+                <Card className="shadow-card">
+                  <CardHeader>
+                    <CardTitle className="font-display text-xl flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-secondary" />
+                      Partner Organizations
+                    </CardTitle>
+                  </CardHeader>
               <CardContent className="space-y-4">
                 {ngos.map((ngo) => (
                   <div

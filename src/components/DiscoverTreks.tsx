@@ -21,6 +21,10 @@ export const DiscoverTreks = () => {
     const fetchDestinations = async () => {
       setLoading(true);
       const data = await destinationsService.getAll();
+      console.log('Fetched destinations:', data);
+      if (data.length > 0) {
+        console.log('First destination vibes:', data[0].vibes, 'Type:', typeof data[0].vibes);
+      }
       setDestinations(data);
       setLoading(false);
     };
@@ -44,7 +48,7 @@ export const DiscoverTreks = () => {
 
   const filteredDestinations = destinations.filter((dest) => {
     const matchesDifficulty = difficulty === 'All' || dest.difficulty === difficulty;
-    const matchesVibe = vibe === 'All' || (dest.vibes && dest.vibes.includes(vibe as any));
+    const matchesVibe = vibe === 'All' || (dest.vibes && dest.vibes.includes(vibe));
     const matchesFavorites = !showFavoritesOnly || favorites.includes(dest.id);
     return matchesDifficulty && matchesVibe && matchesFavorites;
   });
@@ -110,7 +114,7 @@ export const DiscoverTreks = () => {
               {vibeOptions.map((option) => (
                 <Button
                   key={option.value}
-                  variant={vibe === option.value ? 'secondary' : 'outline'}
+                  variant={vibe === option.value ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setVibe(option.value)}
                   className="gap-2"

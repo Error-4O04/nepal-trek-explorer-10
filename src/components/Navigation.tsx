@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mountain, Menu, X, Compass, Calendar, Users } from 'lucide-react';
+import { Mountain, Menu, X, Compass, Calendar, Users, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -13,8 +13,9 @@ export const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
 
   const navItems = [
     { id: 'discover', label: 'Discover', icon: Compass, path: '/#discover' },
-    { id: 'trip-planner', label: 'Trip Planner', icon: Calendar, path: '/#planner' },
+    { id: 'trip-planner', label: 'Trip Planner', icon: Calendar, path: '/planner' },
     { id: 'community', label: 'Community', icon: Users, path: '/#community' },
+    { id: 'activity-log', label: 'Activity Log', icon: History, path: '/activity-log' },
   ];
 
   const handleNavigate = (section: string) => {

@@ -6,6 +6,7 @@ export interface Destination {
   location: string;
   description: string;
   image_url: string;
+  image_detail_url?: string;
   difficulty: 'Easy' | 'Moderate' | 'Challenging';
   duration_min: number;
   duration_max: number;
@@ -47,7 +48,11 @@ export const destinationsService = {
         return [];
       }
 
-      return data || [];
+      // Parse vibes from JSON string to array
+      return (data || []).map((dest: any) => ({
+        ...dest,
+        vibes: dest.vibes ? JSON.parse(dest.vibes) : [],
+      }));
     } catch (error) {
       console.error('Error fetching destinations:', error);
       return [];
@@ -67,7 +72,12 @@ export const destinationsService = {
         return null;
       }
 
-      return data || null;
+      if (!data) return null;
+
+      return {
+        ...data,
+        vibes: data.vibes ? JSON.parse(data.vibes) : [],
+      };
     } catch (error) {
       console.error('Error fetching destination:', error);
       return null;

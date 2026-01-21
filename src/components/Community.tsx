@@ -33,7 +33,7 @@ const initialReviews: Review[] = [
     name: 'Marcus Johnson',
     trek: 'Khopra Ridge Trek',
     rating: 5,
-    text: 'The eco-lodges were fantastic and I loved that my trip helped plant trees. Highly recommend for conscious travelers!',
+    text: 'The eco-lodges were fantastic and the natural beauty was stunning. Highly recommend for conscious travelers!',
     date: '1 month ago',
     avatar: '👨‍🦱',
   },
@@ -68,7 +68,6 @@ export const Community = () => {
   const stats = {
     trekkers: 8247,
     reviews: reviews.length * 156, // Simulated larger number
-    trees: 15420,
   };
 
   const handleSubmitReview = () => {
@@ -128,11 +127,6 @@ export const Community = () => {
             <MessageSquare className="w-8 h-8 mx-auto text-secondary mb-3" />
             <p className="text-3xl font-display font-bold text-secondary">{stats.reviews.toLocaleString()}</p>
             <p className="text-sm text-muted-foreground">Reviews Shared</p>
-          </Card>
-          <Card className="shadow-card text-center p-6 hover-lift">
-            <TreePine className="w-8 h-8 mx-auto text-accent mb-3" />
-            <p className="text-3xl font-display font-bold text-accent">{stats.trees.toLocaleString()}</p>
-            <p className="text-sm text-muted-foreground">Trees Planted</p>
           </Card>
         </div>
 
